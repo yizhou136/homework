@@ -1,0 +1,10 @@
+特点：
+1，采用DDD方式编写，
+
+测试类：
+1，领域(PathStatistics)测试类PathStatisticsTest，主要测试计算topN频率路经, 以及TopN级别的频率路经，同一频率会有多个路经。
+2，业务服务测试类TopNPopularPathServiceTest: 主要测试多线程环境下添加路径及计算TopN频率
+
+
+运行命令：
+mvn test
