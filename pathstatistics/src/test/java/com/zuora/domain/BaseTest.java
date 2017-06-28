@@ -46,7 +46,7 @@ public class BaseTest {
         System.out.println("the PathStatisticsTestData has been inited");
 
 
-        PathStatisticsTestData = new String[][]{
+        /*PathStatisticsTestData = new String[][]{
                 new String[]{"u1","/"},
                 new String[]{"u1","catalog"},
                 new String[]{"u1","subscribers"},
@@ -87,7 +87,7 @@ public class BaseTest {
                 new String[]{"u5","export"},
                 new String[]{"u5","publish"},
                 new String[]{"u5","subscribers"},
-        };
+        };*/
     }
 
     protected SetupAccessPathsCommand setupAccessPathsCommand;

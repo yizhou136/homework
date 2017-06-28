@@ -42,9 +42,10 @@ public class PathStatisticsTest extends BaseTest{
     }
 
     @Test
-    public void testComputeTopNPopularPathGraphArr(){
-        int n = 7;
-        String[] popularPathGraphs = pathStatistics.computeTopNPopularPathGraphArr(n);
+    public void testComputeTopNPopularPathGraphByQuickSort(){
+        int n = 4;
+        String[] popularPathGraphs = pathStatistics.computeTopKPopularPathGraphByQuickSort(n);
+        if (popularPathGraphs == null) return;
         Stream.of(popularPathGraphs).forEach(System.out::println);
         assertTrue(popularPathGraphs.length <= n);
         System.out.println(

@@ -11,9 +11,10 @@ import java.util.stream.Stream;
  * @author by zy.
  */
 public class PathStatistics extends AbstractDomainObject {
-    private int maxSequentialSize;
+    protected int maxSequentialSize;
+    protected ConcurrentHashMap<String,SizedAccessPaths> userAccessPathMap = null;
+
     private ConcurrentHashMap<String, Integer> pathFrequency = null;
-    private ConcurrentHashMap<String,SizedAccessPaths> userAccessPathMap = null;
 
     public PathStatistics(String[][] accessPaths, int maxSequentialSize){
         init(accessPaths, maxSequentialSize);
@@ -22,7 +23,8 @@ public class PathStatistics extends AbstractDomainObject {
     public void init(String[][] accessPaths, int maxSequentialSize) {
         //pathFrequency = new HashMap<>(accessPaths.length);
         //userAccessPathMap = new HashMap<>();
-        pathFrequency = new ConcurrentHashMap<>(accessPaths.length);
+        initPathFrequencyContainer(accessPaths);
+
         userAccessPathMap = new ConcurrentHashMap<>();
         this.maxSequentialSize = maxSequentialSize;
 
@@ -33,6 +35,10 @@ public class PathStatistics extends AbstractDomainObject {
         //System.out.println(pathFrequency);
 
         publishEvent(new SetupAccessPathsDomainEvent(this));
+    }
+
+    protected void initPathFrequencyContainer(String[][] accessPaths){
+        pathFrequency = new ConcurrentHashMap<>(accessPaths.length);
     }
 
     public void appendAccessPath(String [] accessPath){
@@ -137,74 +143,64 @@ public class PathStatistics extends AbstractDomainObject {
         return res;
     }
 
-
-    public String[] computeTopNPopularPathGraphArr(int k) {
-        /*PathGraphCounter[] pathGraphCounters = new PathGraphCounter[pathFrequency.size()];
+    public String[] computeTopKPopularPathGraphByQuickSort(int k) {
+        PathGraphCounter[] pathGraphCounters = new PathGraphCounter[pathFrequency.size()];
         final int[] i = {0};
         pathFrequency.forEach((pathGraph, pathGraphCnt)->{
-            pathGraphCounters[i[0]++]=new PathGraphCounter(pathGraph, pathGraphCnt);
-        });*/
-        PathGraphCounter[]  pathGraphCounters = new PathGraphCounter[8];
+            pathGraphCounters[i[0]++] = new PathGraphCounter(pathGraph, pathGraphCnt);
+        });
+
+        /*PathGraphCounter[] pathGraphCounters = new PathGraphCounter[8];
         pathGraphCounters[0] = new PathGraphCounter("path1", 1);
         pathGraphCounters[1] = new PathGraphCounter("path3", 3);
         pathGraphCounters[2] = new PathGraphCounter("path2", 2);
         pathGraphCounters[3] = new PathGraphCounter("path6", 6);
         pathGraphCounters[4] = new PathGraphCounter("path8", 8);
         pathGraphCounters[5] = new PathGraphCounter("path4", 4);
+        //pathGraphCounters[6] = new PathGraphCounter("path7", 7);
         pathGraphCounters[6] = new PathGraphCounter("path7", 7);
         pathGraphCounters[7] = new PathGraphCounter("path5", 5);
+        //System.out.println(pathGraphCounters.length);
+        //quickTopK(pathGraphCounters, 0, pathGraphCounters.length, k);
+        //quickSort(pathGraphCounters, 0, pathGraphCounters.length-1);*/
 
 
+        quickSortForTopK(pathGraphCounters, 0, pathGraphCounters.length-1, k);
+        Stream.of(pathGraphCounters).forEach((e)->{System.out.println(e.getCount());});
 
-        System.out.println(pathGraphCounters.length);
+        String res[] = new String[k];
+        for (int j=0; j < k; j++){
+            PathGraphCounter pathGraphCounter = pathGraphCounters[j];
+            res[j] = pathGraphCounter.toString();
+        }
 
-        quickTopK(pathGraphCounters, 0, pathGraphCounters.length, k);
-
-        return null;
+        return res;
     }
 
-    private PathGraphCounter[] quickTopK(PathGraphCounter[] pathGraphCounters, int begin, int end, int k){
-        assert begin <= k;
-        assert end >= k;
+    private void quickSortForTopK(PathGraphCounter[] pathGraphCounters, int low, int high, int k){
+        //assert begin <= k;
+        //assert end >= k;
 
-        PathGraphCounter priovit = pathGraphCounters[k];
-        int idx = partionit(pathGraphCounters, begin, end, priovit);
-        /*while (idx != k){
-            idx = partionit(pathGraphCounters, begin, end, priovit);
-        }*/
-
-        return null;
-    }
-
-    private int partionit(PathGraphCounter[] pathGraphCounters, int low, int high, PathGraphCounter provit){
-        int lowI = low;
-        int highI = high - 1;
-
-        while (true){
-            while (pathGraphCounters[lowI].getCount() < provit.getCount()){
-                lowI++;
-            }
-            while (highI > 0 && pathGraphCounters[highI].getCount() > provit.getCount()){
-                highI--;
-            }
-
-            if (lowI >= highI){
-                break;
+        int tmpK  = k - 1;
+        PathGraphCounter privot = pathGraphCounters[high];
+        int mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
+        while (mid != tmpK) {
+            if (mid < tmpK) {
+                low = mid+1;
+                privot = pathGraphCounters[high];
+                mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
             }else {
-                swap(pathGraphCounters, lowI, highI);
+                high = mid - 1;
+                privot = pathGraphCounters[high];
+                mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
             }
         }
-        swap(pathGraphCounters, lowI, highI);
 
-        return lowI;
+        //the best way maybe used by insert sort
+        //Arrays.sort(pathGraphCounters, 0, tmpK);
+
+        PathGraphCounter.quickSort(pathGraphCounters, 0, tmpK);
     }
-
-    private void swap(PathGraphCounter[] pathGraphCounters, int f, int t){
-        PathGraphCounter tmp = pathGraphCounters[f];
-        pathGraphCounters[f] = pathGraphCounters[t];
-        pathGraphCounters[t] = tmp;
-    }
-
 
     @Override
     public String toString() {

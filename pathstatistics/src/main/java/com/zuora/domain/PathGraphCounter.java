@@ -48,4 +48,45 @@ public class PathGraphCounter implements Comparable<PathGraphCounter>{
                 .append("}");
         return stringBuilder.toString();
     }
+
+
+    public static final void quickSort(PathGraphCounter[] pathGraphCounters, int low, int high){
+        if (high > low){
+            PathGraphCounter privot = pathGraphCounters[high];
+            int mid = partitionIt(pathGraphCounters, low, high, privot);
+            quickSort(pathGraphCounters, low, mid-1);
+            quickSort(pathGraphCounters, mid+1, high);
+        }
+    }
+
+    public static final int partitionIt(PathGraphCounter[] pathGraphCounters, int low, int high, PathGraphCounter privot){
+        int lowI = low;
+        int highI = high-1;
+
+        while (true){
+            while (lowI<high && pathGraphCounters[lowI].getCount() >= privot.getCount()){
+                lowI++;
+            }
+            while (highI > 0 && pathGraphCounters[highI].getCount() < privot.getCount()){
+                highI--;
+            }
+
+            if (lowI >= highI){
+                break;
+            }else {
+                swap(pathGraphCounters, lowI, highI);
+            }
+        }
+        swap(pathGraphCounters, lowI, high);
+
+        return lowI;
+    }
+
+    public static final void swap(PathGraphCounter[] pathGraphCounters, int f, int t){
+        if (f != t) {
+            PathGraphCounter tmp = pathGraphCounters[f];
+            pathGraphCounters[f] = pathGraphCounters[t];
+            pathGraphCounters[t] = tmp;
+        }
+    }
 }
