@@ -44,6 +44,50 @@ public class BaseTest {
             System.out.println(arr[0]+" "+arr[1]);
         });*/
         System.out.println("the PathStatisticsTestData has been inited");
+
+
+        PathStatisticsTestData = new String[][]{
+                new String[]{"u1","/"},
+                new String[]{"u1","catalog"},
+                new String[]{"u1","subscribers"},
+                new String[]{"u2","catalog"},
+                new String[]{"u2","subscribers"},
+
+                new String[]{"u1","export"},
+                new String[]{"u1","publish"},
+                new String[]{"u1","subscribers"},
+                new String[]{"u2","export"},
+                new String[]{"u2","publish"},
+                new String[]{"u3","subscribers"},
+
+                new String[]{"u3","fans"},
+                new String[]{"u3","edit"},
+                new String[]{"u3","reg"},
+                new String[]{"u3","export"},
+                new String[]{"u3","publish"},
+                new String[]{"u3","subscribers"},
+                new String[]{"u3","fans"},
+                new String[]{"u3","edit"},
+
+                new String[]{"u4","fans"},
+                new String[]{"u4","edit"},
+                new String[]{"u4","reg"},
+                new String[]{"u4","export"},
+                new String[]{"u4","publish"},
+                new String[]{"u4","subscribers"},
+                new String[]{"u4","fans"},
+                new String[]{"u4","edit"},
+
+                new String[]{"u5","fans"},
+                new String[]{"u5","edit"},
+                new String[]{"u5","reg"},
+                new String[]{"u6","fans"},
+                new String[]{"u6","edit"},
+                new String[]{"u6","reg"},
+                new String[]{"u5","export"},
+                new String[]{"u5","publish"},
+                new String[]{"u5","subscribers"},
+        };
     }
 
     protected SetupAccessPathsCommand setupAccessPathsCommand;

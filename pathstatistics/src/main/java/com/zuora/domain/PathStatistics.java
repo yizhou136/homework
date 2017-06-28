@@ -138,6 +138,74 @@ public class PathStatistics extends AbstractDomainObject {
     }
 
 
+    public String[] computeTopNPopularPathGraphArr(int k) {
+        /*PathGraphCounter[] pathGraphCounters = new PathGraphCounter[pathFrequency.size()];
+        final int[] i = {0};
+        pathFrequency.forEach((pathGraph, pathGraphCnt)->{
+            pathGraphCounters[i[0]++]=new PathGraphCounter(pathGraph, pathGraphCnt);
+        });*/
+        PathGraphCounter[]  pathGraphCounters = new PathGraphCounter[8];
+        pathGraphCounters[0] = new PathGraphCounter("path1", 1);
+        pathGraphCounters[1] = new PathGraphCounter("path3", 3);
+        pathGraphCounters[2] = new PathGraphCounter("path2", 2);
+        pathGraphCounters[3] = new PathGraphCounter("path6", 6);
+        pathGraphCounters[4] = new PathGraphCounter("path8", 8);
+        pathGraphCounters[5] = new PathGraphCounter("path4", 4);
+        pathGraphCounters[6] = new PathGraphCounter("path7", 7);
+        pathGraphCounters[7] = new PathGraphCounter("path5", 5);
+
+
+
+        System.out.println(pathGraphCounters.length);
+
+        quickTopK(pathGraphCounters, 0, pathGraphCounters.length, k);
+
+        return null;
+    }
+
+    private PathGraphCounter[] quickTopK(PathGraphCounter[] pathGraphCounters, int begin, int end, int k){
+        assert begin <= k;
+        assert end >= k;
+
+        PathGraphCounter priovit = pathGraphCounters[k];
+        int idx = partionit(pathGraphCounters, begin, end, priovit);
+        /*while (idx != k){
+            idx = partionit(pathGraphCounters, begin, end, priovit);
+        }*/
+
+        return null;
+    }
+
+    private int partionit(PathGraphCounter[] pathGraphCounters, int low, int high, PathGraphCounter provit){
+        int lowI = low;
+        int highI = high - 1;
+
+        while (true){
+            while (pathGraphCounters[lowI].getCount() < provit.getCount()){
+                lowI++;
+            }
+            while (highI > 0 && pathGraphCounters[highI].getCount() > provit.getCount()){
+                highI--;
+            }
+
+            if (lowI >= highI){
+                break;
+            }else {
+                swap(pathGraphCounters, lowI, highI);
+            }
+        }
+        swap(pathGraphCounters, lowI, highI);
+
+        return lowI;
+    }
+
+    private void swap(PathGraphCounter[] pathGraphCounters, int f, int t){
+        PathGraphCounter tmp = pathGraphCounters[f];
+        pathGraphCounters[f] = pathGraphCounters[t];
+        pathGraphCounters[t] = tmp;
+    }
+
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();

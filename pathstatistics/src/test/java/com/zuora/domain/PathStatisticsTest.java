@@ -41,6 +41,17 @@ public class PathStatisticsTest extends BaseTest{
         }
     }
 
+    @Test
+    public void testComputeTopNPopularPathGraphArr(){
+        int n = 7;
+        String[] popularPathGraphs = pathStatistics.computeTopNPopularPathGraphArr(n);
+        Stream.of(popularPathGraphs).forEach(System.out::println);
+        assertTrue(popularPathGraphs.length <= n);
+        System.out.println(
+                String.format("testComputeTopNPopularPathGraph expected:%d actual:%d",
+                        n, popularPathGraphs.length));
+    }
+
     /**
      * 测试计算TopN级别的频率路经，同一频率会有多个路经。
      */
