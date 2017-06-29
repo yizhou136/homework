@@ -3,6 +3,7 @@ package com.zuora.domain;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Random;
@@ -33,7 +34,7 @@ public class PathStatisticsTest extends BaseTest{
         for (int i=0; i<10; i++) {
             n = random.nextInt(10)+1;
             popularPathGraphs = pathStatistics.computeTopNPopularPathGraph(n);
-            //Stream.of(popularPathGraphs).forEach(System.out::println);
+            Stream.of(popularPathGraphs).forEach(System.out::println);
             assertTrue(popularPathGraphs.length <= n);
             System.out.println(
                     String.format("testComputeTopNPopularPathGraph expected:%d actual:%d",
@@ -43,14 +44,56 @@ public class PathStatisticsTest extends BaseTest{
 
     @Test
     public void testComputeTopNPopularPathGraphByQuickSort(){
-        int n = 4;
-        String[] popularPathGraphs = pathStatistics.computeTopKPopularPathGraphByQuickSort(n);
-        if (popularPathGraphs == null) return;
-        Stream.of(popularPathGraphs).forEach(System.out::println);
-        assertTrue(popularPathGraphs.length <= n);
-        System.out.println(
-                String.format("testComputeTopNPopularPathGraph expected:%d actual:%d",
-                        n, popularPathGraphs.length));
+        Random random = new Random(System.currentTimeMillis());
+        int n = 0;
+        String[] popularPathGraphs = null;
+        for (int i=0; i<10; i++) {
+            n = random.nextInt(10)+1;
+            popularPathGraphs = pathStatistics.computeTopKPopularPathGraphByQuickSort(n);
+            Stream.of(popularPathGraphs).forEach(System.out::println);
+            assertTrue(popularPathGraphs.length <= n);
+            System.out.println(
+                    String.format("testComputeTopNPopularPathGraphByQuickSort expected:%d actual:%d",
+                            n, popularPathGraphs.length));
+        }
+    }
+
+
+    /**
+     * 当topN >= 45时   computeTopKPopularPathGraphByQuickSort占优
+     */
+    @Test
+    public void testComputeTopNPerformance(){
+        for (int out = 0; out < 100; out++) {
+            int count = 10000;
+            int topN = 50;
+            String[] popularPathGraphs = null;
+
+            long begin = System.currentTimeMillis();
+            for (int i = 0; i < count; i++) {
+                popularPathGraphs = pathStatistics.computeTopNPopularPathGraph(topN);
+            }
+            long now = System.currentTimeMillis();
+            long escapeTime = (now - begin);
+            long averageTime = escapeTime / count;
+
+
+            System.out.println("computeTopNPopularPathGraph escapeTime:" + escapeTime + "ms"
+                    + " averageTime:" + averageTime + "ms  "
+                    + popularPathGraphs[0] + "|" + popularPathGraphs[popularPathGraphs.length - 1] + "|" + popularPathGraphs.length);
+
+            begin = System.currentTimeMillis();
+            for (int i = 0; i < count; i++) {
+                popularPathGraphs = pathStatistics.computeTopKPopularPathGraphByQuickSort(topN);
+
+            }
+            now = System.currentTimeMillis();
+            escapeTime = (now - begin);
+            averageTime = escapeTime / count;
+            System.out.println("computeTopKPopularPathGraphByQuickSort escapeTime:" + escapeTime + "ms"
+                    + " averageTime:" + averageTime + "ms  "
+                    + popularPathGraphs[0] + "|" + popularPathGraphs[popularPathGraphs.length - 1] + "|" + popularPathGraphs.length);
+        }
     }
 
     /**

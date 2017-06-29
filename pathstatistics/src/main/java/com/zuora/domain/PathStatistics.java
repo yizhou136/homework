@@ -133,10 +133,6 @@ public class PathStatistics extends AbstractDomainObject {
         String res[] = new String[queue.size()];
         for (int i=0; !queue.isEmpty(); i++){
             PathGraphCounter pathGraphCounter = queue.remove();
-            //res[i] = pathGraphCounter.getPathGraph();
-            /*res[i] = String.format("%s %d",
-                    pathGraphCounter.getPathGraph(),
-                    pathGraphCounter.getCount());*/
             res[i] = pathGraphCounter.toString();
         }
 
@@ -144,32 +140,26 @@ public class PathStatistics extends AbstractDomainObject {
     }
 
     public String[] computeTopKPopularPathGraphByQuickSort(int k) {
+        Objects.requireNonNull(pathFrequency, ()->{return "the pathFrequency is null and PathStatistics not be init?";});
+
+        if (pathFrequency.isEmpty())
+            return new String[0];
+
         PathGraphCounter[] pathGraphCounters = new PathGraphCounter[pathFrequency.size()];
         final int[] i = {0};
         pathFrequency.forEach((pathGraph, pathGraphCnt)->{
             pathGraphCounters[i[0]++] = new PathGraphCounter(pathGraph, pathGraphCnt);
         });
 
-        /*PathGraphCounter[] pathGraphCounters = new PathGraphCounter[8];
-        pathGraphCounters[0] = new PathGraphCounter("path1", 1);
-        pathGraphCounters[1] = new PathGraphCounter("path3", 3);
-        pathGraphCounters[2] = new PathGraphCounter("path2", 2);
-        pathGraphCounters[3] = new PathGraphCounter("path6", 6);
-        pathGraphCounters[4] = new PathGraphCounter("path8", 8);
-        pathGraphCounters[5] = new PathGraphCounter("path4", 4);
-        //pathGraphCounters[6] = new PathGraphCounter("path7", 7);
-        pathGraphCounters[6] = new PathGraphCounter("path7", 7);
-        pathGraphCounters[7] = new PathGraphCounter("path5", 5);
-        //System.out.println(pathGraphCounters.length);
-        //quickTopK(pathGraphCounters, 0, pathGraphCounters.length, k);
-        //quickSort(pathGraphCounters, 0, pathGraphCounters.length-1);*/
 
+        quickSortForTopK(pathGraphCounters,k);
+        //PathGraphCounter.insertSort(pathGraphCounters, 0, pathGraphCounters.length-1);
+        //Arrays.sort(pathGraphCounters);
+        //Stream.of(pathGraphCounters).forEach((e)->{System.out.println(e.getCount());});
 
-        quickSortForTopK(pathGraphCounters, 0, pathGraphCounters.length-1, k);
-        Stream.of(pathGraphCounters).forEach((e)->{System.out.println(e.getCount());});
-
-        String res[] = new String[k];
-        for (int j=0; j < k; j++){
+        int len = Math.min(pathGraphCounters.length, k);
+        String res[] = new String[len];
+        for (int j=0; j < res.length; j++){
             PathGraphCounter pathGraphCounter = pathGraphCounters[j];
             res[j] = pathGraphCounter.toString();
         }
@@ -177,29 +167,31 @@ public class PathStatistics extends AbstractDomainObject {
         return res;
     }
 
-    private void quickSortForTopK(PathGraphCounter[] pathGraphCounters, int low, int high, int k){
-        //assert begin <= k;
-        //assert end >= k;
+    private void quickSortForTopK(PathGraphCounter[] pathGraphCounters, int k){
+        int low = 0;
+        int high = pathGraphCounters.length - 1;
+        int latch = 20;
+        int sortLen = high;
 
-        int tmpK  = k - 1;
-        PathGraphCounter privot = pathGraphCounters[high];
-        int mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
-        while (mid != tmpK) {
-            if (mid < tmpK) {
-                low = mid+1;
-                privot = pathGraphCounters[high];
-                mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
-            }else {
-                high = mid - 1;
-                privot = pathGraphCounters[high];
-                mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
+        if (k <= (high-latch)) {
+            PathGraphCounter privot = pathGraphCounters[high];
+            int mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
+            while (mid != k && mid >= 0) {
+                if (mid < k) {
+                    low = mid + 1;
+                    privot = pathGraphCounters[high];
+                    mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
+                } else {
+                    high = mid - 1;
+                    privot = pathGraphCounters[high];
+                    mid = PathGraphCounter.partitionIt(pathGraphCounters, low, high, privot);
+                }
             }
+            sortLen = k;
         }
-
         //the best way maybe used by insert sort
         //Arrays.sort(pathGraphCounters, 0, tmpK);
-
-        PathGraphCounter.quickSort(pathGraphCounters, 0, tmpK);
+        PathGraphCounter.quickSort(pathGraphCounters, 0, sortLen);
     }
 
     @Override
